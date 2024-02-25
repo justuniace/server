@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// schema.prisma
+
+model Student {
+  student_number  String    @id @map("_id")
+  first_name      String?
+  middle_name     String?
+  last_name       String?
+  gender          String?
+  birthdate       DateTime?
+  status          String?
+  email           String    @unique
+  strand          String?
+  program_id      String?   
+  student_password String?
+  program         Program?  @relation(fields: [program_id], references: [program_id])
+  grades          Grade[]   
+  validated       Validated[]
+  evaluate        Evaluate[]
+}
+
+model Program {
+  program_id      String    @id @default(cuid()) @map("_id")
+  program_abbr    String
+  program_name    String
+  courses         Course[]
+  students        Student[] 
+  faculties       Faculty[]
+}
+
+model Course {
+  course_id      String   @id @default(cuid()) @map("_id")
+  year_started   Int?
+  course_code    String
+  course_title   String
+  credit_unit    Int
+  pre_requisite  String?
+  course_year    Int
+  course_sem     String
+  num_lab        Int?
+  num_lecture    Int?
+
+  program_id     String 
+  grades         Grade[]  
+  validated      Validated[]
+  program        Program  @relation(fields: [program_id], references: [program_id])
+}
+
+model Grade {
+  grade_id      String       @id @default(cuid()) @map("_id")
+  student_number String
+  course_id     String
+  grades        Float
+  remarks       String
+  validated     Validated[]
+
+    student       Student      @relation(fields: [student_number], references: [student_number])
+    course        Course       @relation(fields: [course_id], references: [course_id])
+}
+
+model Faculty {
+  faculty_number  String   @id @default(cuid()) @map("_id")
+  faculty_fname   String?
+  faculty_mname   String?
+  faculty_lname   String?
+  faculty_password String?
+  gender          String?
+  birthdate       DateTime?
+  email           String    @unique
+
+  program_id      String?
+  validated       Validated[]
+  evaluate         Evaluate[]
+  program         Program?  @relation(fields: [program_id], references: [program_id])
+}
+
+
+model Validated {
+  validate_id    String      @id @default(cuid()) @map("_id")
+  student_number String
+  grade_id       String
+  faculty_number     String
+  date_validated DateTime
+  course_id      String
+
+   student        Student  @relation(fields: [student_number], references: [student_number])
+   grade          Grade    @relation(fields: [grade_id], references: [grade_id])
+   faculty        Faculty  @relation(fields: [faculty_number], references: [faculty_number])
+   course         Course   @relation(fields: [course_id], references: [course_id])
+}
+
+model Evaluate {
+  evaluate_id         String       @id @default(cuid()) @map("_id")
+  course_reco         String   
+  evalcredit_unit     Int?
+  requiredcredit_unit Int?
+  faculty_number      String
+  student_number      String
+  date_eval           DateTime?
+  eval_year           Int?
+  eval_sem            String?
+
+  faculty             Faculty  @relation(fields: [faculty_number], references: [faculty_number])
+  student             Student  @relation(fields: [student_number], references: [student_number])
+}
+
+model Admin {
+  admin_number  String       @id @default(cuid()) @map("_id")
+  admin_fname   String?
+  admin_lname   String?
+  admin_mname   String?
+  admin_email   String   @unique
+  admin_password String
+}
