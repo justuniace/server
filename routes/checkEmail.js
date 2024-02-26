@@ -18,6 +18,7 @@ router.post("/checkEmail", async (req, res) => {
       res
         .status(200)
         .json({ exists: true, first_name, last_name, student_number });
+        
       console.log(first_name, last_name, student_number);
     } else {
       res.status(200).json({ exists: false });

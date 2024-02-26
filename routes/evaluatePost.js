@@ -1,48 +1,48 @@
-import express from "express";
 import { PrismaClient } from "@prisma/client";
+import express from "express";
 
 const prisma = new PrismaClient();
 const router = express.Router();
 
 router.post("/evaluate", async (req, res) => {
   try {
-    // Extract data from the request body
     const {
       course_reco,
       evalcredit_unit,
       requiredcredit_unit,
-      faculty_id,
+      faculty_number,
       student_number,
       date_eval,
       eval_year,
       eval_sem,
     } = req.body;
 
-    // Create a new evaluation record using Prisma Client
-    const newEvaluation = await prisma.evaluate.create({
+    // Convert eval_year to an integer if it's a string
+    const evalYear = parseInt(eval_year);
+
+    // Use Prisma Client to create a new evaluation record
+    const evaluation = await prisma.evaluate.create({
       data: {
         course_reco,
         evalcredit_unit,
         requiredcredit_unit,
-        faculty_id,
+        faculty_number,
         student_number,
         date_eval,
-        eval_year,
+        eval_year: isNaN(evalYear) ? null : evalYear, // Provide integer or null value
         eval_sem,
       },
     });
 
-    console.log("Data inserted successfully");
-
-    // Respond with a success message
-    res
-      .status(201)
-      .json({ message: "Data inserted successfully", data: newEvaluation });
+    return res.json(evaluation);
   } catch (error) {
-    console.error("Error inserting data into the database: ", error);
-    // Handle errors
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("Error inserting data into the database:", error);
+    return res.status(500).json({
+      error: "Internal Server Error",
+      details: "An unexpected error occurred.",
+    });
   }
 });
+
 
 export default router;

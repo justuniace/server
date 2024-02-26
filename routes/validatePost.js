@@ -18,6 +18,7 @@ router.post("/validate", async (req, res) => {
       const studentNumber = item.student_number;
       const gradeId = item.grade_id;
       console.log("Received date to validate:", item.date_validated);
+
       // Parse the date from the request data
       const dateValidated = new Date(item.date_validated);
 
@@ -25,24 +26,12 @@ router.post("/validate", async (req, res) => {
       if (isNaN(dateValidated)) {
         throw new Error("Invalid date format");
       }
-      const formattedDate = dateValidated.toISOString().slice(0, 10);
 
-      const existingRecord = await prisma.validated.findFirst({
-        where: {
-          student_number: studentNumber,
-          course_id: item.course_id,
-          date_validated: { not: null },
-        },
-      });
-
-      if (existingRecord) {
-        // Skip inserting duplicate record
-        console.log("Duplicate record found. Skipping insertion.");
-        return;
-      }
+      // Format the date into ISO-8601 DateTime format
+      const formattedDate = dateValidated.toISOString();
 
       // Insert data into the database
-      await prisma.validate.create({
+      await prisma.validated.create({
         data: {
           student_number: studentNumber,
           grade_id: gradeId,
@@ -68,5 +57,4 @@ router.post("/validate", async (req, res) => {
     }
   }
 });
-
 export default router;

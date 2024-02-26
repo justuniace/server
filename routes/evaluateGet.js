@@ -60,10 +60,13 @@ router.get("/evaluate-faculty", async (req, res) => {
 router.get("/evaluate-recommend", async (req, res) => {
   try {
     const { student_number, eval_year, eval_sem } = req.query;
+
+    const year = parseInt(eval_year, 10);
+
     const evaluations = await prisma.evaluate.findMany({
       where: {
         student_number: student_number,
-        eval_year: eval_year,
+        eval_year: year,
         eval_sem: eval_sem,
       },
     });

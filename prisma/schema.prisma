@@ -94,7 +94,7 @@ model Validated {
   student_number String
   grade_id       String
   faculty_number     String
-  date_validated DateTime
+  date_validated  DateTime
   course_id      String
 
    student        Student  @relation(fields: [student_number], references: [student_number])
@@ -110,7 +110,7 @@ model Evaluate {
   requiredcredit_unit Int?
   faculty_number      String
   student_number      String
-  date_eval           DateTime?
+  date_eval           String
   eval_year           Int?
   eval_sem            String?
 

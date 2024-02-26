@@ -9,54 +9,43 @@ const prisma = new PrismaClient();
 // Update or insert grades
 router.put("/update-grades", async (req, res) => {
   try {
-    const { studentNumber, courseId, grades, remarks } = req.body;
-
-    console.log("Received Request Body:", req.body);
-
+    const { studentNumber, course_id, grades, remarks } = req.body;
     if (
       !studentNumber ||
-      !courseId ||
+      !course_id ||
       grades === undefined ||
       remarks === undefined
     ) {
-      console.log("Invalid request. Missing data.");
       return res.status(400).json({ error: "Invalid request. Missing data." });
     }
 
-const existingGrade = await prisma.grade.findFirst({
-  where: {
-    student_number: studentNumber,
-    course_id: courseId,
-  },
-});
-
-
-
-    console.log("Existing Grade:", existingGrade);
+    // Query for the existing grade record
+    const existingGrade = await prisma.grade.findFirst({
+      where: {
+        student_number: studentNumber,
+        course_id: course_id,
+      },
+    });
 
     if (existingGrade) {
-      console.log("Updating existing grade with data:", { grades, remarks });
-
       await prisma.grade.update({
-        where: { student_number_course_id: { studentNumber, courseId } },
-        data: { grades, remarks },
+        where: {
+          grade_id: existingGrade.grade_id,
+        },
+        data: {
+          grades: grades,
+          remarks: remarks,
+        },
       });
       console.log("Grades updated successfully");
       res.status(200).json({ message: "Grades updated successfully" });
     } else {
-      console.log("Creating new grade with data:", {
-        studentNumber,
-        courseId,
-        grades,
-        remarks,
-      });
-
       await prisma.grade.create({
         data: {
-          student: { connect: { student_number: studentNumber } },
-          course: { connect: { course_id: courseId } },
-          grades,
-          remarks,
+          student_number: studentNumber,
+          course_id: course_id,
+          grades: grades,
+          remarks: remarks,
         },
       });
       console.log("New grades inserted successfully");
@@ -67,6 +56,7 @@ const existingGrade = await prisma.grade.findFirst({
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 // Update grades by student number and course code
 router.put("/grades/:studentNumber/:courseCode", async (req, res) => {

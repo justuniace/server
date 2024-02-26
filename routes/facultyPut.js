@@ -26,22 +26,41 @@ router.put("/updatefacultypassword/:facultyemail", async (req, res) => {
 
 // Update faculty by email
 router.put("/updatefaculty/:email", async (req, res) => {
-  const email = req.params.email;
-  const updatedFacultyData = req.body;
-
   try {
-    await prisma.faculty.update({
+    const { email } = req.params;
+    const {
+      faculty_fname,
+      faculty_mname,
+      faculty_lname,
+      gender,
+      birthdate, // Assuming birthdate is provided as a Date object
+    } = req.body;
+
+    // Format the birthdate as an ISO-8601 DateTime string
+    const formattedBirthdate = new Date(birthdate).toISOString();
+
+    // Use Prisma Client to update the faculty record
+    const updatedFaculty = await prisma.faculty.update({
       where: { email },
-      data: updatedFacultyData,
+      data: {
+        faculty_fname,
+        faculty_mname,
+        faculty_lname,
+        gender,
+        birthdate: formattedBirthdate, // Provide formatted birthdate
+      },
     });
 
-    console.log("Faculty updated successfully");
-    res.json({ message: "Faculty updated successfully" });
+    return res.json(updatedFaculty);
   } catch (error) {
     console.error("Error updating faculty:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({
+      error: "Internal Server Error",
+      details: "An unexpected error occurred.",
+    });
   }
 });
+
 
 // Update faculty by facultyId
 router.put("/faculty/:facultyId", async (req, res) => {

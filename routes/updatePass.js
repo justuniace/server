@@ -15,9 +15,13 @@ router.post("/updatePassword", async (req, res) => {
     );
     console.log("New password:", studentPassword);
 
+    if (!studentNumber) {
+      return res.status(400).json({ error: "Student number is required" });
+    }
+
     await prisma.student.update({
       where: { student_number: studentNumber },
-      data: { student_password:  studentPassword },
+      data: { student_password: studentPassword },
     });
 
     console.log(
@@ -31,6 +35,7 @@ router.post("/updatePassword", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 router.post("/facultyupdatePassword", async (req, res) => {
   try {

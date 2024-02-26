@@ -1,40 +1,47 @@
 // students.js
 
-import express from "express";
 import { PrismaClient } from "@prisma/client";
+import express from "express";
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-router.put("/updatestudentspassword/:studentNumber", async (req, res) => {
+router.put("/updatestudents/:studentNumber", async (req, res) => {
   try {
-    const studentNumber = req.params.studentNumber;
-    const { student_password } = req.body;
+    const { studentNumber } = req.params;
+    const {
+      first_name,
+      middle_name,
+      last_name,
+      gender,
+      birthdate,
+      status,
+      email,
+      strand,
+    } = req.body;
+
+    const formattedBirthdate = new Date(birthdate).toISOString();
 
     const updatedStudent = await prisma.student.update({
       where: { student_number: studentNumber },
       data: {
-        student_password,
+        first_name,
+        middle_name,
+        last_name,
+        gender,
+        birthdate: formattedBirthdate,
+        status,
+        email,
+        strand,
       },
     });
 
-    console.log("Updated Student:", updatedStudent);
-
-    if (updatedStudent) {
-      res.json({ message: "Student password updated successfully" });
-    } else {
-      res.status(404).json({ message: "Student not found" });
-    }
+    res.json({ message: "Student updated successfully", updatedStudent });
   } catch (error) {
-    console.error("Error updating student password:", error.message);
-    res
-      .status(500)
-      .json({ error: "An error occurred while updating student password" });
+    console.error("Error updating student:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
-
 
 router.put("/updatestudents/:studentNumber", async (req, res) => {
   try {
@@ -94,10 +101,5 @@ router.put("/updatestudentspassword/:studentNumber", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
-
-
-
 
 export default router;

@@ -167,7 +167,7 @@ router.get("/curriculum/:courseCode", async (req, res) => {
 
   try {
     // Use Prisma Client to find the course by course code
-    const course = await prisma.course.findUnique({
+    const course = await prisma.course.findFirst({
       where: {
         course_code: courseCode,
       },
@@ -384,23 +384,29 @@ router.get("/curriculum-first-first", async (req, res) => {
 
 router.get("/curriculumfirst-second", async (req, res) => {
   try {
-    const { programId, year_started } = req.query;
+     const programId = req.query.program_id;
+     const year_started = parseInt(req.query.year_started); 
 
-    // Query to get total credit units for the first semester of the second year
-    const totalCreditUnits = await prisma.course.aggregate({
-      _sum: {
-        credit_unit: true,
+    // Convert year to an integer if it's a string
+    const yearStarted = parseInt(year);
+
+    const aggregateResult = await prisma.course.aggregate({
+      select: {
+        _sum: {
+          select: {
+            credit_unit: true,
+          },
+        },
       },
       where: {
         program_id: programId,
-        year_started: year_started,
+        year_started: isNaN(yearStarted) ? null : yearStarted, // Provide integer or null value
         course_year: 1,
         course_sem: "SECOND SEMESTER",
       },
     });
 
-    console.log("Total Credit Units:", totalCreditUnits);
-    return res.json({ totalCreditUnits: totalCreditUnits._sum.credit_unit });
+    return res.json(aggregateResult);
   } catch (error) {
     console.error("Error in /curriculumfirst-second route:", error);
     return res.status(500).json({
@@ -409,6 +415,7 @@ router.get("/curriculumfirst-second", async (req, res) => {
     });
   }
 });
+
 
 router.get("/curriculumsecond-first", async (req, res) => {
   try {
