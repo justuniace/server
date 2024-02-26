@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import dotenv from "dotenv";
 import cors from "cors";
+import dotenv from "dotenv";
 import express from "express";
 import adminGetRouter from "./routes/adminGet.js"; // Import the router instance
 import adminPutRouter from "./routes/adminPut.js";
@@ -34,7 +34,7 @@ const prisma = new PrismaClient();
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173", // Replace with your client-side origin
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
   })
 );
 
