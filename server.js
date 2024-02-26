@@ -32,6 +32,12 @@ dotenv.config();
 
 const prisma = new PrismaClient();
 const app = express();
+app.use((req, res, next) => {
+  console.log("Request received:", req.method, req.url);
+  next();
+});
+
+// Add your CORS middleware after the logging middleware
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || "http://localhost:5173",
