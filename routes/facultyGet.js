@@ -4,9 +4,6 @@ import express from "express";
 const prisma = new PrismaClient();
 const router = express.Router();
 
-
-
-
 router.get("/faculty/password/:email", async (req, res) => {
   const email = req.params.email;
 
@@ -51,7 +48,6 @@ router.get("/faculty/:email", async (req, res) => {
 router.get("/faculty", async (req, res) => {
   try {
     const faculty = await prisma.faculty.findMany();
-
     return res.json(faculty);
   } catch (error) {
     console.error("Error executing query:", error);

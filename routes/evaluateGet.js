@@ -101,20 +101,32 @@ router.get("/evaluate-get", async (req, res) => {
 router.get("/evaluate-units", async (req, res) => {
   try {
     const { eval_year, eval_sem, student_number } = req.query;
-    const totalEvalCredit = await prisma.evaluate.aggregate({
+
+    // Parse eval_year to integer
+    const parsedEvalYear = parseInt(eval_year);
+
+    // Query to get total evaluated credit units
+    const totalEvaluatedCreditUnits = await prisma.evaluate.aggregate({
       _sum: {
         evalcredit_unit: true,
       },
       where: {
-        eval_year: eval_year,
+        eval_year: parsedEvalYear, // Use the parsed value here
         eval_sem: eval_sem,
         student_number: student_number,
       },
     });
-    return res.json({ totalEvalCredit: totalEvalCredit._sum.evalcredit_unit });
+
+    console.log("Total Evaluated Credit Units:", totalEvaluatedCreditUnits);
+    return res.json({
+      totalEvaluatedCreditUnits: totalEvaluatedCreditUnits._sum.evalcredit_unit,
+    });
   } catch (error) {
     console.error("Error calculating total evaluation credits:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({
+      error: "Internal Server Error",
+      details: "An unexpected error occurred.",
+    });
   }
 });
 

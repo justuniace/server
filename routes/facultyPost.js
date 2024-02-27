@@ -1,27 +1,33 @@
-import express from "express";
 import { PrismaClient } from "@prisma/client";
+import express from "express";
 
 const prisma = new PrismaClient();
 const router = express.Router();
 
-router.post("/faculty", async (req, res) => {
+router.post("/faculty/:email", async (req, res) => {
+  // Retrieve email from URL parameters
+  const email = req.params.email;
+
+  // Check if email is provided
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+
   const formattedBirthdate = new Date(req.body.birthdate);
 
   try {
     const faculty = await prisma.faculty.create({
       data: {
-        faculty_fname: req.body.faculty_fname,
-        faculty_mname: req.body.faculty_mname,
-        faculty_lname: req.body.faculty_lname,
         faculty_password: req.body.faculty_password,
         gender: req.body.gender,
         birthdate: formattedBirthdate,
-        email: req.body.email,
-        program: { connect: { program_id: req.body.program_id } },
+        email: email, // Use the email from URL parameters
       },
     });
 
     console.log("Data inserted successfully");
+
+    
 
     res.status(201).json({ message: "Data inserted successfully", faculty });
   } catch (error) {
@@ -55,7 +61,5 @@ router.post("/faculty/:facultyNumber", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
 
 export default router;

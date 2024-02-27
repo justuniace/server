@@ -83,11 +83,23 @@ model Faculty {
   email           String    @unique
 
   program_id      String?
+ emailVerified   Boolean   @default(false)
+
   validated       Validated[]
   evaluate         Evaluate[]
   program         Program?  @relation(fields: [program_id], references: [program_id])
+
 }
 
+model VerificationToken {
+  id            String     @id @default(cuid()) @map("_id")
+  email         String  
+  token         String   
+  createdAt     DateTime 
+
+  
+  @@index([email])
+}
 
 model Validated {
   validate_id    String      @id @default(cuid()) @map("_id")

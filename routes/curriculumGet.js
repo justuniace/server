@@ -194,7 +194,8 @@ router.get("/curriculum/:courseCode", async (req, res) => {
 
 router.get("/curriculum-prerequisite", async (req, res) => {
   try {
-    const { programId, yearStarted } = req.query;
+    const programId = req.query.programId?.toString(); // Convert to string explicitly
+    const yearStarted = req.query.yearStarted?.toString(); // Convert to string explicitly
 
     // Checking if programId and yearStarted are provided
     if (!programId || !yearStarted) {
@@ -207,7 +208,7 @@ router.get("/curriculum-prerequisite", async (req, res) => {
     // Query to get curriculum with prerequisites
     const courses = await prisma.course.findMany({
       where: {
-        year_started: yearStarted,
+        year_started: parseInt(yearStarted), // Convert to integer if necessary
         program_id: programId,
         NOT: {
           pre_requisite: null,
@@ -224,8 +225,8 @@ router.get("/curriculum-prerequisite", async (req, res) => {
     const modifiedCourses = courses.map((course) => ({
       course_code: course.course_code.trim(),
       pre_requisite: course.pre_requisite
-        .split(",")
-        .map((prereq) => prereq.trim()),
+        ? course.pre_requisite.split(",").map((prereq) => prereq.trim())
+        : [], // Check if pre_requisite is defined before splitting
     }));
 
     console.log(
@@ -358,6 +359,9 @@ router.get("/curriculum-first-first", async (req, res) => {
   try {
     const { programId, year_started } = req.query;
 
+    // Parse year_started to integer
+    const parsedYearStarted = parseInt(year_started);
+
     // Query to get total credit units for the first semester of the first year
     const totalCreditUnits = await prisma.course.aggregate({
       _sum: {
@@ -365,7 +369,7 @@ router.get("/curriculum-first-first", async (req, res) => {
       },
       where: {
         program_id: programId,
-        year_started: year_started,
+        year_started: parsedYearStarted, // Use the parsed value here
         course_year: 1,
         course_sem: "FIRST SEMESTER",
       },
@@ -384,31 +388,28 @@ router.get("/curriculum-first-first", async (req, res) => {
 
 router.get("/curriculumfirst-second", async (req, res) => {
   try {
-     const programId = req.query.program_id;
-     const year_started = parseInt(req.query.year_started); 
+    const { programId, year_started } = req.query;
 
-    // Convert year to an integer if it's a string
-    const yearStarted = parseInt(year);
+    // Parse year_started to integer
+    const parsedYearStarted = parseInt(year_started);
 
-    const aggregateResult = await prisma.course.aggregate({
-      select: {
-        _sum: {
-          select: {
-            credit_unit: true,
-          },
-        },
+    // Query to get total credit units for the first semester of the first year
+    const totalCreditUnits = await prisma.course.aggregate({
+      _sum: {
+        credit_unit: true,
       },
       where: {
         program_id: programId,
-        year_started: isNaN(yearStarted) ? null : yearStarted, // Provide integer or null value
+        year_started: parsedYearStarted, // Use the parsed value here
         course_year: 1,
         course_sem: "SECOND SEMESTER",
       },
     });
 
-    return res.json(aggregateResult);
+    console.log("Total Credit Units:", totalCreditUnits);
+    return res.json({ totalCreditUnits: totalCreditUnits._sum.credit_unit });
   } catch (error) {
-    console.error("Error in /curriculumfirst-second route:", error);
+    console.error("Error in /curriculum-first-first route:", error);
     return res.status(500).json({
       error: "Internal Server Error",
       details: "An unexpected error occurred.",
@@ -416,10 +417,12 @@ router.get("/curriculumfirst-second", async (req, res) => {
   }
 });
 
-
 router.get("/curriculumsecond-first", async (req, res) => {
   try {
     const { programId, year_started } = req.query;
+
+    // Parse year_started to integer
+    const parsedYearStarted = parseInt(year_started);
 
     // Query to get total credit units for the first semester of the second year
     const totalCreditUnits = await prisma.course.aggregate({
@@ -428,7 +431,7 @@ router.get("/curriculumsecond-first", async (req, res) => {
       },
       where: {
         program_id: programId,
-        year_started: year_started,
+        year_started: parsedYearStarted,
         course_year: 2,
         course_sem: "FIRST SEMESTER",
       },
@@ -449,6 +452,8 @@ router.get("/curriculumsecond-second", async (req, res) => {
   try {
     const { programId, year_started } = req.query;
 
+    const parsedYearStarted = parseInt(year_started);
+
     // Query to get total credit units for the second semester of the second year
     const totalCreditUnits = await prisma.course.aggregate({
       _sum: {
@@ -456,7 +461,7 @@ router.get("/curriculumsecond-second", async (req, res) => {
       },
       where: {
         program_id: programId,
-        year_started: year_started,
+        year_started: parsedYearStarted,
         course_year: 2,
         course_sem: "SECOND SEMESTER",
       },
@@ -477,6 +482,8 @@ router.get("/curriculumthird-first", async (req, res) => {
   try {
     const { programId, year_started } = req.query;
 
+    const parsedYearStarted = parseInt(year_started);
+
     // Query to get total credit units for the first semester of the third year
     const totalCreditUnits = await prisma.course.aggregate({
       _sum: {
@@ -484,7 +491,7 @@ router.get("/curriculumthird-first", async (req, res) => {
       },
       where: {
         program_id: programId,
-        year_started: year_started,
+        year_started: parsedYearStarted,
         course_year: 3,
         course_sem: "FIRST Semester",
       },
@@ -505,6 +512,8 @@ router.get("/curriculumthird-second", async (req, res) => {
   try {
     const { programId, year_started } = req.query;
 
+    const parsedYearStarted = parseInt(year_started);
+
     // Query to get total credit units for the second semester of the third year
     const totalCreditUnits = await prisma.course.aggregate({
       _sum: {
@@ -512,7 +521,7 @@ router.get("/curriculumthird-second", async (req, res) => {
       },
       where: {
         program_id: programId,
-        year_started: year_started,
+        year_started: parsedYearStarted,
         course_year: 3,
         course_sem: "SECOND SEMESTER",
       },
@@ -533,6 +542,8 @@ router.get("/curriculumfourth-first", async (req, res) => {
   try {
     const { programId, year_started } = req.query;
 
+    const parsedYearStarted = parseInt(year_started);
+
     // Query to get total credit units for the first semester of the fourth year
     const totalCreditUnits = await prisma.course.aggregate({
       _sum: {
@@ -540,7 +551,7 @@ router.get("/curriculumfourth-first", async (req, res) => {
       },
       where: {
         program_id: programId,
-        year_started: year_started,
+        year_started: parsedYearStarted,
         course_year: 4,
         course_sem: "FIRST SEMESTER",
       },
@@ -561,6 +572,8 @@ router.get("/curriculumfourth-second", async (req, res) => {
   try {
     const { programId, year_started } = req.query;
 
+    const parsedYearStarted = parseInt(year_started);
+
     // Query to get total credit units for the second semester of the fourth year
     const totalCreditUnits = await prisma.course.aggregate({
       _sum: {
@@ -568,7 +581,7 @@ router.get("/curriculumfourth-second", async (req, res) => {
       },
       where: {
         program_id: programId,
-        year_started: year_started,
+        year_started: parsedYearStarted,
         course_year: 4,
         course_sem: "SECOND SEMESTER",
       },
@@ -589,6 +602,8 @@ router.get("/curriculumsummer", async (req, res) => {
   try {
     const { programId, year_started } = req.query;
 
+    const parsedYearStarted = parseInt(year_started);
+
     // Query to get total credit units for the summer semester
     const totalCreditUnits = await prisma.course.aggregate({
       _sum: {
@@ -596,7 +611,7 @@ router.get("/curriculumsummer", async (req, res) => {
       },
       where: {
         program_id: programId,
-        year_started: year_started,
+        year_started: parsedYearStarted,
         course_sem: "SUMMER SEMESTER",
       },
     });
@@ -616,6 +631,8 @@ router.get("/calculate_total_credit_units", async (req, res) => {
   try {
     const { programId, year_started } = req.query;
 
+    const parsedYearStarted = parseInt(year_started);
+
     // Query to calculate total credit units
     const totalCreditUnits = await prisma.course.aggregate({
       _sum: {
@@ -623,7 +640,7 @@ router.get("/calculate_total_credit_units", async (req, res) => {
       },
       where: {
         program_id: programId,
-        year_started: year_started,
+        year_started: parsedYearStarted,
       },
     });
 

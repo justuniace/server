@@ -1,6 +1,7 @@
 import express from "express";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import crypto from "crypto"; // Import the crypto module
 
 dotenv.config();
 
@@ -14,6 +15,19 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+app.post("/generateVerificationToken", async (req, res) => {
+  try {
+    const { email } = req.body;
+    const token = crypto.randomBytes(20).toString("hex");
+
+    // Store the token in your database for verification later
+
+    res.status(200).json({ token });
+  } catch (error) {
+    console.error("Error generating verification token:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 app.post("/sendEmail", async (req, res) => {
   try {
     const { to, subject, text } = req.body;

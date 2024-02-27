@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import adminGetRouter from "./routes/adminGet.js"; // Import the router instance
@@ -26,32 +26,13 @@ import updatePass from "./routes/updatePass.js";
 import upload from "./routes/upload.js";
 import validateGet from "./routes/validateGet.js";
 import validatePost from "./routes/validatePost.js";
+//import veriToken from "./routes/veriToken.js";
 
 dotenv.config();
 
-const prisma = new PrismaClient();
 const app = express();
 
-app.use((req, res, next) => {
-  const allowedOrigins = [
-    "http://localhost:5173",
-    "https://pupsces.vercel.app",
-  ];
-  const origin = req.headers.origin;
-
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
-
-  // Set other CORS headers if needed
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, DELETE"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
-
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
