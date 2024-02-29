@@ -27,6 +27,7 @@ model Student {
   strand          String?
   program_id      String?   
   student_password String?
+  isVerified   Boolean   @default(false)
   program         Program?  @relation(fields: [program_id], references: [program_id])
   grades          Grade[]   
   validated       Validated[]
@@ -81,9 +82,8 @@ model Faculty {
   gender          String?
   birthdate       DateTime?
   email           String    @unique
-
   program_id      String?
- emailVerified   Boolean   @default(false)
+  isVerified   Boolean   @default(false)
 
   validated       Validated[]
   evaluate         Evaluate[]

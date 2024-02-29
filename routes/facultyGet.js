@@ -55,7 +55,7 @@ router.get("/faculty", async (req, res) => {
   }
 });
 
-router.get("/facultyId/:facultyNumber", async (req, res) => {
+router.get("/facultyNumber/:facultyNumber", async (req, res) => {
   const facultyNumber = req.params.facultyNumber;
 
   try {

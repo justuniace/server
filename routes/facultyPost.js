@@ -27,8 +27,6 @@ router.post("/faculty/:email", async (req, res) => {
 
     console.log("Data inserted successfully");
 
-    
-
     res.status(201).json({ message: "Data inserted successfully", faculty });
   } catch (error) {
     console.error("Error inserting data into the database: ", error);
@@ -44,6 +42,32 @@ router.post("/faculty/:facultyNumber", async (req, res) => {
     const updatedFaculty = await prisma.faculty.update({
       where: { faculty_number: facultyNumber },
       data: { gender, birthdate },
+    });
+
+    if (!updatedFaculty) {
+      console.log("No faculty found for faculty number:", facultyNumber);
+      return res.status(404).json({ message: "Faculty not found" });
+    }
+
+    // Successful update
+    res.status(200).json({
+      message: "Faculty data updated successfully",
+      faculty: updatedFaculty,
+    });
+  } catch (error) {
+    console.error("Error during update:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/facultySignin/:facultyNumber", async (req, res) => {
+  const facultyNumber = req.params.facultyNumber;
+  const { gender, birthdate, faculty_password } = req.body;
+
+  try {
+    const updatedFaculty = await prisma.faculty.update({
+      where: { faculty_number: facultyNumber },
+      data: { gender, birthdate, faculty_password },
     });
 
     if (!updatedFaculty) {
