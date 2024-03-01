@@ -64,4 +64,30 @@ router.post("/students/:studentNumber", async (req, res) => {
   }
 });
 
+router.post("/studentverification/:studentNumber", async (req, res) => {
+  const studentNumber = req.params.studentNumber;
+  const { isVerified } = req.body;
+
+  try {
+    const updatedStudent = await prisma.student.update({
+      where: { student_number: studentNumber },
+      data: { isVerified },
+    });
+
+    if (!updatedStudent) {
+      console.log("No faculty found for student number:", studentNumber);
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    // Successful update
+    res.status(200).json({
+      message: "Student data updated successfully",
+      student: updatedStudent,
+    });
+  } catch (error) {
+    console.error("Error during update:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default router;

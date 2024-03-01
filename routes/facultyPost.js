@@ -86,4 +86,30 @@ router.post("/facultySignin/:facultyNumber", async (req, res) => {
   }
 });
 
+router.post("/facultyverification/:facultyNumber", async (req, res) => {
+  const facultyNumber = req.params.facultyNumber;
+  const { isVerified } = req.body;
+
+  try {
+    const updatedFaculty = await prisma.faculty.update({
+      where: { faculty_number: facultyNumber },
+      data: { isVerified},
+    });
+
+    if (!updatedFaculty) {
+      console.log("No faculty found for faculty number:", facultyNumber);
+      return res.status(404).json({ message: "Faculty not found" });
+    }
+
+    // Successful update
+    res.status(200).json({
+      message: "Faculty data updated successfully",
+      faculty: updatedFaculty,
+    });
+  } catch (error) {
+    console.error("Error during update:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default router;
