@@ -68,8 +68,8 @@ router.get("/facultyNumber/:facultyNumber", async (req, res) => {
       return res.status(404).json({ error: "Faculty not found" });
     }
 
-    console.log("Result:", faculty); // Log the result to check
-    return res.json(faculty); // Assuming you expect a single faculty record
+    console.log("Result:", faculty); 
+    return res.json(faculty); 
   } catch (error) {
     console.error("Error executing query:", error);
     return res.status(500).json({ error: "Internal Server Error" });

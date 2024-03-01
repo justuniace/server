@@ -1,5 +1,5 @@
-import express from "express";
 import { PrismaClient } from "@prisma/client";
+import express from "express";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -14,7 +14,7 @@ router.post("/students", async (req, res) => {
       gender,
       birthdate,
       status,
-      email, 
+      email,
       strand,
     } = req.body;
 
@@ -47,6 +47,32 @@ router.post("/students/:studentNumber", async (req, res) => {
     const updatedStudent = await prisma.student.update({
       where: { student_number: studentNumber },
       data: {
+        gender,
+        status,
+        strand,
+      },
+    });
+
+    console.log("Updated Student:", updatedStudent);
+
+    res.json(updatedStudent);
+  } catch (error) {
+    console.error("Error during update:", error.message);
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the student" });
+  }
+});
+
+router.post("/studentsSignin/:studentNumber", async (req, res) => {
+  try {
+    const studentNumber = req.params.studentNumber;
+    const { gender, status, strand, student_password } = req.body;
+
+    const updatedStudent = await prisma.student.update({
+      where: { student_number: studentNumber },
+      data: {
+        student_password,
         gender,
         status,
         strand,

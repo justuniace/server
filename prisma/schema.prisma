@@ -91,15 +91,7 @@ model Faculty {
 
 }
 
-model VerificationToken {
-  id            String     @id @default(cuid()) @map("_id")
-  email         String  
-  token         String   
-  createdAt     DateTime 
 
-  
-  @@index([email])
-}
 
 model Validated {
   validate_id    String      @id @default(cuid()) @map("_id")
@@ -137,4 +129,5 @@ model Admin {
   admin_mname   String?
   admin_email   String   @unique
   admin_password String
+  isVerified   Boolean   @default(false)
 }
