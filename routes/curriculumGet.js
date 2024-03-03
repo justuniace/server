@@ -79,6 +79,42 @@ router.get("/curriculum", async (req, res) => {
   }
 });
 
+router.get("/graduate-curriculum", async (req, res) => {
+  console.log("Received GET request to /graduate-curriculum");
+
+  // Extract programId, yearStarted, and course_id from the query parameters
+  const programId = req.query.programId;
+  const yearStarted = parseInt(req.query.yearStarted, 10);
+  const courseId = req.query.course_id;
+
+  if (!programId || !yearStarted || !courseId) {
+    return res.status(400).json({
+      error:
+        "Both programId, yearStarted, and course_id are required in the query parameters.",
+    });
+  }
+
+  try {
+    // Use Prisma Client to query courses based on programId, yearStarted, and courseId
+    const courses = await prisma.course.findMany({
+      where: {
+        program_id: programId,
+        year_started: yearStarted,
+        course_id: courseId,
+      },
+      include: {
+        program: true, // Include related program data
+      },
+    });
+
+    // Send the courses data back to the client
+    return res.json(courses);
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 router.get("/evalcurriculum", async (req, res) => {
   try {
     console.log("Received GET request to /evalcurriculum");
@@ -194,11 +230,11 @@ router.get("/curriculum/:courseCode", async (req, res) => {
 
 router.get("/curriculum-prerequisite", async (req, res) => {
   try {
-    const programId = req.query.programId?.toString(); // Convert to string explicitly
-    const yearStarted = req.query.yearStarted?.toString(); // Convert to string explicitly
+    const program_id = req.query.program_id?.toString(); // Convert to string explicitly
+    const year_started = req.query.year_started?.toString(); // Convert to string explicitly
 
     // Checking if programId and yearStarted are provided
-    if (!programId || !yearStarted) {
+    if (!program_id || !year_started) {
       return res.status(400).json({
         error:
           "Both programId and yearStarted are required in the query parameters.",
@@ -208,8 +244,8 @@ router.get("/curriculum-prerequisite", async (req, res) => {
     // Query to get curriculum with prerequisites
     const courses = await prisma.course.findMany({
       where: {
-        year_started: parseInt(yearStarted), // Convert to integer if necessary
-        program_id: programId,
+        year_started,// Convert to integer if necessary
+        program_id,
         NOT: {
           pre_requisite: null,
           pre_requisite: "",
