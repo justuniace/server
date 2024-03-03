@@ -85,12 +85,12 @@ router.get("/graduate-curriculum", async (req, res) => {
   // Extract programId, yearStarted, and course_id from the query parameters
   const programId = req.query.programId;
   const yearStarted = parseInt(req.query.yearStarted, 10);
-  const courseId = req.query.course_id;
+  const courseId = req.query.courseId;
 
   if (!programId || !yearStarted || !courseId) {
     return res.status(400).json({
       error:
-        "Both programId, yearStarted, and course_id are required in the query parameters.",
+        "Both programId, yearStarted, and courseId are required in the query parameters.",
     });
   }
 
@@ -231,7 +231,7 @@ router.get("/curriculum/:courseCode", async (req, res) => {
 router.get("/curriculum-prerequisite", async (req, res) => {
   try {
     const program_id = req.query.program_id?.toString(); // Convert to string explicitly
-    const year_started = req.query.year_started?.toString(); // Convert to string explicitly
+    const year_started = parseInt(req.query.year_started, 10); // Convert to string explicitly
 
     // Checking if programId and yearStarted are provided
     if (!program_id || !year_started) {
@@ -529,7 +529,7 @@ router.get("/curriculumthird-first", async (req, res) => {
         program_id: programId,
         year_started: parsedYearStarted,
         course_year: 3,
-        course_sem: "FIRST Semester",
+        course_sem: "FIRST SEMESTER",
       },
     });
 
