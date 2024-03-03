@@ -42,8 +42,8 @@ router.get("/curriculum", async (req, res) => {
   console.log("Received GET request to /curriculum");
 
   // Extract program_id and year_started from the query parameters
-  const programId = req.query.program_id;
-  const yearStarted = parseInt(req.query.year_started, 10);
+  const programId = req.query.programId;
+  const yearStarted = parseInt(req.query.yearStarted, 10);
 
   if (!programId || !yearStarted) {
     return res.status(400).json({
@@ -83,16 +83,16 @@ router.get("/evalcurriculum", async (req, res) => {
   try {
     console.log("Received GET request to /evalcurriculum");
 
-    const programId = req.query.program_id;
-    const yearStarted = parseInt(req.query.year_started, 10);
+    const programId = req.query.programId;
+    const yearStarted = parseInt(req.query.yearStarted, 10);
 
-    const courseCode = req.query.course_code;
+    const courseCode = req.query.courseCode;
 
     // Check if all required query parameters are provided
     if (!programId || !yearStarted || !courseCode) {
       return res.status(400).json({
         error:
-          "program_id, year_started, and course_code are required query parameters.",
+          "programId, yearStarted, and courseCode are required query parameters.",
       });
     }
 
