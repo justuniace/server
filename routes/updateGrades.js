@@ -19,6 +19,16 @@ router.put("/update-grades", async (req, res) => {
       return res.status(400).json({ error: "Invalid request. Missing data." });
     }
 
+    // Parse the grades to a float
+    const parsedGrades = parseFloat(grades);
+
+    // Check if the parsedGrades is a valid float
+    if (isNaN(parsedGrades)) {
+      return res
+        .status(400)
+        .json({ error: "Invalid grades value. Must be a number." });
+    }
+
     // Query for the existing grade record
     const existingGrade = await prisma.grade.findFirst({
       where: {
@@ -33,7 +43,7 @@ router.put("/update-grades", async (req, res) => {
           grade_id: existingGrade.grade_id,
         },
         data: {
-          grades: grades,
+          grades: parsedGrades, // Use parsedGrades instead of grades
           remarks: remarks,
         },
       });
@@ -44,7 +54,7 @@ router.put("/update-grades", async (req, res) => {
         data: {
           student_number: studentNumber,
           course_id: course_id,
-          grades: grades,
+          grades: parsedGrades, // Use parsedGrades instead of grades
           remarks: remarks,
         },
       });
