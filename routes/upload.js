@@ -11,7 +11,7 @@ const storage = multer.memoryStorage();
 router.post("/studentsupload", async (req, res) => {
   console.log("Natatawag");
   try {
-    const { studentsData, program_id } = req.body;
+    const { studentsData, program_id, curriculum_year } = req.body;
 
     if (!studentsData || !Array.isArray(studentsData)) {
       return res.status(400).json({ error: "Invalid data format" });
@@ -65,7 +65,8 @@ router.post("/studentsupload", async (req, res) => {
               status,
               student_password,
               strand,
-              program_id, // Add program_id to the parameters
+              program_id,
+              curriculum_year, // Add program_id to the parameters
             },
           });
           console.log("Data inserted successfully");

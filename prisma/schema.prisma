@@ -27,6 +27,7 @@ model Student {
   strand          String?
   program_id      String?   
   student_password String?
+  curriculum_year  Int?
   isVerified   Boolean   @default(false)
   program         Program?  @relation(fields: [program_id], references: [program_id])
   grades          Grade[]   
