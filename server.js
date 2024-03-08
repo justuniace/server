@@ -27,6 +27,14 @@ import upload from "./routes/upload.js";
 import validateGet from "./routes/validateGet.js";
 import validatePost from "./routes/validatePost.js";
 //import veriToken from "./routes/veriToken.js";
+import uploadGet from "./routes/uploadGet.js";
+import uploadPost from "./routes/uploadPost.js";
+
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 dotenv.config();
 
@@ -66,6 +74,10 @@ app.use("/api", updatePass);
 app.use("/api", upload);
 app.use("/api", validateGet);
 app.use("/api", validatePost);
+app.use("/api", uploadGet);
+app.use("/api", uploadPost);
+
+app.use("/api/v1/uploads", express.static(`${__dirname}/public`));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

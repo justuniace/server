@@ -42,6 +42,7 @@ model Program {
   courses         Course[]
   students        Student[] 
   faculties       Faculty[]
+   message          Message[]
 }
 
 model Course {
@@ -88,7 +89,9 @@ model Faculty {
 
   validated       Validated[]
   evaluate         Evaluate[]
+ 
   program         Program?  @relation(fields: [program_id], references: [program_id])
+
 
 }
 
@@ -131,4 +134,20 @@ model Admin {
   admin_email   String   @unique
   admin_password String
   isVerified   Boolean   @default(false)
+}
+
+model Message {
+  message_id  String @id @default(cuid()) @map("_id")
+  name        String
+  inputMessage String
+  email        String
+  image        String?
+  program_id   String
+  incoming_id   String
+  outgoing_id   String
+  sent_at      DateTime
+  is_read      Boolean  @default(false)
+
+  program         Program?  @relation(fields: [program_id], references: [program_id])
+
 }
