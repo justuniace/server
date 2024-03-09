@@ -105,6 +105,14 @@ router.get("/evaluate-units", async (req, res) => {
     // Parse eval_year to integer
     const parsedEvalYear = parseInt(eval_year);
 
+    
+     if (isNaN(parsedEvalYear)) {
+       return res.status(400).json({
+         error: "Bad Request",
+         details: "Invalid evaluation year.",
+       });
+     }
+
     // Query to get total evaluated credit units
     const totalEvaluatedCreditUnits = await prisma.evaluate.aggregate({
       _sum: {
